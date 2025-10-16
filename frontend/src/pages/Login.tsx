@@ -1,58 +1,79 @@
 import React, { useState } from "react";
-import { IonPage, IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonInput, IonItem, IonLabel, IonText } from "@ionic/react";
+import {
+  IonPage,
+  IonContent,
+  IonButton,
+  IonSelect,
+  IonSelectOption,
+  IonText,
+  IonToolbar,
+  IonButtons,
+  IonTitle,
+  IonLabel,
+  IonItem,
+  useIonRouter,
+} from "@ionic/react";
+import "./Login.css";
 
-const Login: React.FC<{ onLogin: (token: string, role: string) => void }> = ({ onLogin }) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
+const Login: React.FC = () => {
+  const [role, setRole] = useState<string>("");
+  const router = useIonRouter();
 
-  const handleLogin = async () => {
-    try {
-      const response = await fetch("http://localhost:4000/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
+  const handleLogin = () => {
+    if (!role) return;
+    localStorage.setItem("role", role);
 
-      if (!response.ok) {
-        throw new Error("Credenciales inválidas");
-      }
-
-      const data: { token: string; role: string } = await response.json();
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role);
-      onLogin(data.token, data.role);
-    } catch (error) {
-      if (error instanceof Error) {
-        setErrorMsg(error.message);
-      } else {
-        setErrorMsg("Error desconocido al iniciar sesión");
-      }
-    }
+    if (role === "citizen") router.push("/citizen", "forward");
+    if (role === "driver") router.push("/driver", "forward");
+    if (role === "admin") router.push("/admin", "forward");
   };
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar color="primary">
-          <IonTitle>Iniciar sesión</IonTitle>
-        </IonToolbar>
-      </IonHeader>
+      {/* NAVBAR */}
+      <IonToolbar color="success" className="navbar">
+        <IonButtons slot="start" className="navbar-logo">
+          <IonTitle>TrashApp</IonTitle>
+        </IonButtons>
+        <IonButtons slot="end" className="navbar-links">
+          <IonText className="navbar-link">OffLine</IonText>
+          <IonText className="navbar-link">Ayuda</IonText>
+        </IonButtons>
+      </IonToolbar>
 
-      <IonContent className="ion-padding">
-        <IonItem>
-          <IonLabel position="floating">Usuario</IonLabel>
-          <IonInput value={username} onIonChange={(e) => setUsername(e.detail.value!)} />
-        </IonItem>
+      {/* HERO SECTION */}
+      <IonContent className="login-bg">
+        <div className="hero-container">
+          <h1 className="hero-title">TrashApp</h1>
+          <h2 className="hero-subtitle">Por más calles limpias</h2>
 
-        <IonItem>
-          <IonLabel position="floating">Contraseña</IonLabel>
-          <IonInput type="password" value={password} onIonChange={(e) => setPassword(e.detail.value!)} />
-        </IonItem>
+          <div className="select-container">
+            <IonItem className="login-item" lines="none">
+              <IonLabel position="stacked" className="label-rol">
+                Rol
+              </IonLabel>
+              <IonSelect
+                interface="popover"
+                placeholder="Seleccionar Rol"
+                value={role}
+                onIonChange={(e) => setRole(e.detail.value)}
+              >
+                <IonSelectOption value="citizen">Ciudadano</IonSelectOption>
+                <IonSelectOption value="driver">Conductor</IonSelectOption>
+                <IonSelectOption value="admin">Administrador</IonSelectOption>
+              </IonSelect>
+            </IonItem>
+          </div>
 
-        {errorMsg && <IonText color="danger"><p>{errorMsg}</p></IonText>}
-
-        <IonButton expand="block" onClick={handleLogin}>Entrar</IonButton>
+          <IonButton
+            expand="block"
+            className="login-button"
+            onClick={handleLogin}
+            disabled={!role}
+          >
+            INGRESAR
+          </IonButton>
+        </div>
       </IonContent>
     </IonPage>
   );

@@ -1,0 +1,29 @@
+# Node / backend
+node_modules/
+dist/
+build/
+npm-debug.log
+yarn-error.log
+
+# Env
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Ionic/Capacitor
+www/
+android/
+ios/
+build/
+.capacitor/
+
+# Logs
+logs/
+*.log
